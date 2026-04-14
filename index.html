@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="ru" class="h-full">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FLORISTA</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Montserrat:wght@400;600;700&amp;display=swap"
+    rel="stylesheet">
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      scroll-behavior: smooth
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    .font-heading {
+      font-family: 'Bebas Neue', sans-serif
+    }
+
+    .font-body {
+      font-family: 'Montserrat', sans-serif
+    }
+
+    .brutal-shadow {
+      box-shadow: 6px 6px 0 #000
+    }
+
+    .brutal-shadow-red {
+      box-shadow: 6px 6px 0 #b91c1c
+    }
+
+    .brutal-border {
+      border: 3px solid #000
+    }
+
+    .card-hover {
+      transition: transform .2s, box-shadow .2s
+    }
+
+    .card-hover:hover {
+      transform: translate(-3px, -3px);
+      box-shadow: 9px 9px 0 #000
+    }
+
+    .btn-brutal {
+      transition: transform .15s, box-shadow .15s
+    }
+
+    .btn-brutal:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 #000
+    }
+
+    .btn-brutal:active {
+      transform: translate(0, 0);
+      box-shadow: 2px 2px 0 #000
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    .anim-up {
+      animation: slideUp .6s ease forwards;
+      opacity: 0
+    }
+
+    .anim-fade {
+      animation: fadeIn .8s ease forwards;
+      opacity: 0
+    }
+
+    .delay-1 {
+      animation-delay: .1s
+    }
+
+    .delay-2 {
+      animation-delay: .2s
+    }
+
+    .delay-3 {
+      animation-delay: .3s
+    }
+
+    .delay-4 {
+      animation-delay: .4s
+    }
+
+    .delay-5 {
+      animation-delay: .5s
+    }
+
+    .delay-6 {
+      animation-delay: .6s
+    }
+
+    .stripe-bg {
+      background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(185, 28, 28, .05) 10px, rgba(185, 28, 28, .05) 20px)
+    }
+
+    .nav-link {
+      position: relative;
+      transition: color .2s
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 3px;
+      background: #dc2626;
+      transition: width .2s
+    }
+
+    .nav-link:hover::after {
+      width: 100%
+    }
+
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .toast {
+      padding: 12px 20px;
+      border: 3px solid #000;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      animation: slideUp .3s ease forwards
+    }
+
+    .marquee {
+      overflow: hidden;
+      white-space: nowrap
+    }
+
+    .marquee-inner {
+      display: inline-block;
+      animation: marqueeScroll 20s linear infinite
+    }
+
+    @keyframes marqueeScroll {
+      from {
+        transform: translateX(0)
+      }
+
+      to {
+        transform: translateX(-50%)
+      }
+    }
+
+    .hero-pattern {
+      background-image: radial-gradient(circle at 20% 50%, rgba(220, 38, 38, .15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(220, 38, 38, .1) 0%, transparent 40%)
+    }
+
+    .product-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border: 3px solid #000
+    }
+  </style>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { brutal: { red: '#dc2626', dark: '#b91c1c', black: '#0a0a0a', white: '#fafafa' } } } } }
+  </script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+  </style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+</head>
+
+<body class="h-full font-body bg-white text-brutal-black overflow-x-hidden">
+  <div id="app" class="w-full h-full overflow-auto">
+    <!-- TOAST -->
+    <div id="toast-container" class="toast-container"></div><!-- CART MODAL -->
+    <div id="cart-modal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-black/60" onclick="closeCart()"></div>
+      <div
+        class="absolute right-0 top-0 h-full w-full max-w-md bg-white brutal-border border-r-0 border-t-0 border-b-0 overflow-auto"
+        style="animation:slideUp .3s ease">
+        <div class="p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="font-heading text-3xl">КОРЗИНА</h2><button onclick="closeCart()"
+              class="brutal-border p-2 btn-brutal bg-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+          </div>
+          <div id="cart-items" class="space-y-4"></div>
+          <div id="cart-empty" class="text-center py-12 text-gray-400 font-heading text-xl">
+            Корзина пуста
+          </div>
+          <div id="cart-footer" class="hidden mt-6 pt-6 border-t-3 border-black">
+            <div class="flex justify-between font-heading text-2xl mb-4"><span>ИТОГО:</span><span id="cart-total">0
+                с</span>
+            </div><a id="cart-wa-btn" href="#" target="_blank" rel="noopener noreferrer"
+              class="block w-full bg-green-500 text-white text-center font-heading text-xl py-4 brutal-border btn-brutal">
+              <span class="flex items-center justify-center gap-2">ЗАКАЗАТЬ В WHATSAPP</span> </a>
+          </div>
+        </div>
+      </div>
+    </div><!-- NAV -->
+    <nav class="sticky top-0 z-40 bg-white border-b-3 border-black">
+      <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16 md:h-20">
+        <a href="#top" class="font-heading text-2xl md:text-3xl tracking-wide" id="nav-logo"> <span
+          class="text-brutal-red">FLORISTA</span>  </a>
+        <div class="hidden md:flex items-center gap-8">
+          <a href="#catalog" class="nav-link font-semibold text-sm uppercase tracking-wider">Каталог</a> <a
+            href="#howto" class="nav-link font-semibold text-sm uppercase tracking-wider">Как заказать</a> <a
+            href="#reviews" class="nav-link font-semibold text-sm uppercase tracking-wider">Отзывы</a> <a
+            href="#contacts" class="nav-link font-semibold text-sm uppercase tracking-wider">Контакты</a>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="openCart()" class="relative brutal-border p-2 btn-brutal bg-white"> <i
+              data-lucide="shopping-bag" class="w-5 h-5"></i> <span id="cart-count"
+              class="absolute -top-2 -right-2 bg-brutal-red text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold hidden">0</span>
+          </button> <button onclick="toggleMobile()" class="md:hidden brutal-border p-2 btn-brutal bg-white"><i
+              data-lucide="menu" class="w-5 h-5"></i></button>
+        </div>
+      </div><!-- Mobile menu -->
+      <div id="mobile-menu" class="hidden md:hidden border-t-3 border-black bg-white">
+        <div class="flex flex-col p-4 gap-3">
+          <a href="#catalog" onclick="closeMobile()"
+            class="font-heading text-xl py-2 border-b-2 border-gray-200">КАТАЛОГ</a> <a href="#howto"
+            onclick="closeMobile()" class="font-heading text-xl py-2 border-b-2 border-gray-200">КАК ЗАКАЗАТЬ</a> <a
+            href="#reviews" onclick="closeMobile()"
+            class="font-heading text-xl py-2 border-b-2 border-gray-200">ОТЗЫВЫ</a> <a href="#contacts"
+            onclick="closeMobile()" class="font-heading text-xl py-2">КОНТАКТЫ</a>
+        </div>
+      </div>
+    </nav><!-- MARQUEE -->
+    <div class="bg-brutal-red text-white py-2 border-b-3 border-black marquee">
+      <div class="marquee-inner font-heading text-lg tracking-widest">
+        <span class="mx-8"> БЕСПЛАТНАЯ ДОСТАВКА ПО ГОРОДУ</span> <span class="mx-8"> СВЕЖИЕ ЦВЕТЫ КАЖДЫЙ ДЕНЬ</span>
+        <span class="mx-8"> ПОДАРКИ К КАЖДОМУ ЗАКАЗУ</span> <span class="mx-8"> ДОСТАВКА ЗА 60 МИНУТ</span> <span
+          class="mx-8"> БЕСПЛАТНАЯ ДОСТАВКА ПО ГОРОДУ</span> <span class="mx-8"> СВЕЖИЕ ЦВЕТЫ КАЖДЫЙ ДЕНЬ</span>
+        <span class="mx-8"> ПОДАРКИ К КАЖДОМУ ЗАКАЗУ</span> <span class="mx-8"> ДОСТАВКА ЗА 60 МИНУТ</span>
+      </div>
+    </div><!-- HERO -->
+    <section id="top" class="relative hero-pattern stripe-bg">
+      <div class="max-w-7xl mx-auto px-4 py-16 md:py-24 flex flex-col md:flex-row items-center gap-8 md:gap-12">
+        <div class="flex-1 anim-up">
+          <div
+            class="inline-block bg-brutal-red text-white font-heading text-sm tracking-widest px-4 py-1 brutal-border mb-4">
+            ЦВЕТОЧНЫЙ МАГАЗИН
+          </div>
+          <h1 id="hero-title" class="font-heading text-6xl md:text-8xl lg:text-9xl leading-none mb-4">ЦВЕТЫ С<br><span
+              class="text-brutal-red">ХАРАКТЕРОМ</span></h1>
+          <p id="hero-subtitle" class="text-lg md:text-xl text-gray-600 mb-8 max-w-md font-semibold">Доставка по городу
+            за 60 минут. Букеты, которые говорят громче слов.</p><a href="#catalog"
+            class="inline-block bg-brutal-red text-white font-heading text-2xl px-10 py-4 brutal-border brutal-shadow btn-brutal tracking-wider">ВЫБРАТЬ
+            БУКЕТ →</a>
+        </div>
+        <div class="flex-1 anim-up delay-2 max-w-lg w-full">
+          <div class="brutal-border brutal-shadow-red bg-white p-3 rotate-2 hover:rotate-0 transition-transform"><img
+              src="logit.jpeg"
+              alt="Красивые цветы" loading="lazy" class="w-full rounded"
+              onerror="this.style.background='#fef2f2'; this.style.display='none'">
+          </div>
+        </div>
+      </div>
+    </section><!-- CATALOG -->
+    <section id="catalog" class="bg-brutal-black text-white py-16 md:py-24 border-t-3 border-black">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-12 anim-up">
+          <h2 class="font-heading text-5xl md:text-7xl">КАТАЛОГ</h2>
+          <div class="w-24 h-1 bg-brutal-red mx-auto mt-4"></div>
+        </div><!-- Category tabs -->
+        <div class="flex flex-wrap justify-center gap-3 mb-12">
+          <button onclick="filterCat('all')"
+            class="cat-btn active font-heading text-lg px-6 py-2 brutal-border bg-brutal-red text-white btn-brutal"
+            data-cat="all">ВСЕ</button> <button onclick="filterCat('bouquets')"
+            class="cat-btn font-heading text-lg px-6 py-2 brutal-border bg-white text-black btn-brutal"
+            data-cat="bouquets">БУКЕТЫ</button> <button onclick="filterCat('box')"
+            class="cat-btn font-heading text-lg px-6 py-2 brutal-border bg-white text-black btn-brutal" data-cat="box">В
+            КОРОБКЕ</button> <button onclick="filterCat('basket')"
+            class="cat-btn font-heading text-lg px-6 py-2 brutal-border bg-white text-black btn-brutal"
+            data-cat="basket">В КАШПО И КОРЗИНКЕ</button> <button onclick="filterCat('toys')"
+            class="cat-btn font-heading text-lg px-6 py-2 brutal-border bg-white text-black btn-brutal"
+            data-cat="toys">МЯГКИЕ ИГРУШКИ</button> <button onclick="filterCat('choco')"
+            class="cat-btn font-heading text-lg px-6 py-2 brutal-border bg-white text-black btn-brutal"
+            data-cat="choco">КЛУБНИКА В ШОКОЛАДЕ</button>
+        </div><!-- Product grid -->
+        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        </div>
+      </div>
+    </section><!-- WA BANNER -->
+    <section class="bg-green-500 border-t-3 border-b-3 border-black py-12 md:py-16 stripe-bg">
+      <div class="max-w-4xl mx-auto px-4 text-center">
+        <div class="bg-white brutal-border brutal-shadow p-8 md:p-12">
+          <div class="text-5xl mb-4">
+            
+          </div>
+          <h2 class="font-heading text-4xl md:text-6xl mb-4">ЗАКАЗАТЬ В <span class="text-green-600">WHATSAPP</span>
+          </h2>
+          <p class="text-gray-600 mb-8 text-lg">Напишите нам — подберём идеальный букет и доставим быстро!</p><a
+            id="wa-banner-btn" href="https://wa.me/996224000404" target="_blank" rel="noopener noreferrer"
+            class="inline-block bg-green-500 text-white font-heading text-2xl px-10 py-4 brutal-border brutal-shadow btn-brutal tracking-wider">НАПИСАТЬ
+            В WHATSAPP →</a>
+        </div>
+      </div>
+    </section><!-- HOW TO ORDER -->
+    <section id="howto" class="py-16 md:py-24 bg-white">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="font-heading text-5xl md:text-7xl">КАК ЗАКАЗАТЬ</h2>
+          <div class="w-24 h-1 bg-brutal-red mx-auto mt-4"></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div class="brutal-border brutal-shadow bg-white p-6 text-center card-hover">
+            <div
+              class="w-16 h-16 bg-brutal-red text-white font-heading text-3xl flex items-center justify-center mx-auto mb-4 brutal-border">
+              1
+            </div>
+            <h3 class="font-heading text-2xl mb-2">ВЫБЕРИТЕ</h3>
+            <p class="text-gray-600 text-sm">Выберите букет из каталога или опишите свои пожелания</p>
+          </div>
+          <div class="brutal-border brutal-shadow bg-white p-6 text-center card-hover">
+            <div
+              class="w-16 h-16 bg-brutal-red text-white font-heading text-3xl flex items-center justify-center mx-auto mb-4 brutal-border">
+              2
+            </div>
+            <h3 class="font-heading text-2xl mb-2">НАПИШИТЕ</h3>
+            <p class="text-gray-600 text-sm">Отправьте заказ в WhatsApp или позвоните нам</p>
+          </div>
+          <div class="brutal-border brutal-shadow bg-white p-6 text-center card-hover">
+            <div
+              class="w-16 h-16 bg-brutal-red text-white font-heading text-3xl flex items-center justify-center mx-auto mb-4 brutal-border">
+              3
+            </div>
+            <h3 class="font-heading text-2xl mb-2">ПОДТВЕРДИТЕ</h3>
+            <p class="text-gray-600 text-sm">Мы согласуем детали, время и адрес доставки</p>
+          </div>
+          <div class="brutal-border brutal-shadow bg-white p-6 text-center card-hover">
+            <div
+              class="w-16 h-16 bg-brutal-red text-white font-heading text-3xl flex items-center justify-center mx-auto mb-4 brutal-border">
+              4
+            </div>
+            <h3 class="font-heading text-2xl mb-2">ПОЛУЧИТЕ</h3>
+            <p class="text-gray-600 text-sm">Курьер доставит букет в течение 60 минут</p>
+          </div>
+        </div>
+      </div>
+    </section><!-- REVIEWS -->
+    <section id="reviews" class="py-16 md:py-24 bg-brutal-black text-white border-t-3 border-black">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="font-heading text-5xl md:text-7xl">ОТЗЫВЫ</h2>
+          <div class="w-24 h-1 bg-brutal-red mx-auto mt-4"></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="brutal-border bg-white text-black p-6 card-hover">
+            <div class="flex items-center gap-3 mb-4">
+              <div
+                class="w-12 h-12 bg-brutal-red text-white font-heading text-xl flex items-center justify-center brutal-border">
+                А
+              </div>
+              <div>
+                <p class="font-bold">Анна К.</p>
+                <div class="text-yellow-500 text-sm">
+                  ★★★★★
+                </div>
+              </div>
+            </div>
+            <p class="text-gray-600 text-sm mb-4">Заказывала букет на день рождения мамы. Доставили за 40 минут! Букет
+              был невероятно красивый, мама была в восторге! </p><img
+              src="03.jpg"
+              alt="Букет Страсть" loading="lazy" class="w-full rounded" onerror="this.style.background='#fef2f2'">
+          </div>
+          <div class="brutal-border bg-white text-black p-6 card-hover">
+            <div class="flex items-center gap-3 mb-4">
+              <div
+                class="w-12 h-12 bg-brutal-red text-white font-heading text-xl flex items-center justify-center brutal-border">
+                Д
+              </div>
+              <div>
+                <p class="font-bold">Асан С.</p>
+                <div class="text-yellow-500 text-sm">
+                  ★★★★★
+                </div>
+              </div>
+            </div>
+            <p class="text-gray-600 text-sm mb-4">Клубника в шоколаде — просто бомба! Жена была счастлива. Оформление на
+              высшем уровне, как в лучших кондитерских! </p><img
+              src="club.jpeg"
+              alt="Клубника в шоколаде" loading="lazy" class="w-full rounded" onerror="this.style.background='#fef2f2'">
+          </div>
+          <div class="brutal-border bg-white text-black p-6 card-hover">
+            <div class="flex items-center gap-3 mb-4">
+              <div
+                class="w-12 h-12 bg-brutal-red text-white font-heading text-xl flex items-center justify-center brutal-border">
+                М
+              </div>
+              <div>
+                <p class="font-bold">Айгул В.</p>
+                <div class="text-yellow-500 text-sm">
+                  ★★★★★
+                </div>
+              </div>
+            </div>
+            <p class="text-gray-600 text-sm mb-4">Цветы в коробке — это что-то! Шикарная подача, все коллеги завидовали.
+              Теперь заказываю только здесь! </p><img
+              src="white.jpeg"
+              alt="Цветы в коробке" loading="lazy" class="w-full rounded" onerror="this.style.background='#fef2f2'">
+          </div>
+        </div>
+      </div>
+    </section><!-- CONTACTS -->
+    <section id="contacts" class="py-16 md:py-24 bg-white border-t-3 border-black">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="font-heading text-5xl md:text-7xl">КОНТАКТЫ</h2>
+          <div class="w-24 h-1 bg-brutal-red mx-auto mt-4"></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="brutal-border brutal-shadow bg-white p-8 text-center card-hover">
+            <div class="w-16 h-16 bg-brutal-red text-white flex items-center justify-center mx-auto mb-4 brutal-border">
+              <i data-lucide="map-pin" class="w-8 h-8"></i>
+            </div>
+            <h3 class="font-heading text-2xl mb-2">АДРЕС</h3>
+            <p id="contact-address" class="text-gray-600">г. Манас,1 Адрес:Курманбек 4Г</p>
+            <p id="contact-address" class="text-gray-600">г. Манас,2 Адрес:Пр.Т.Байзакова 33</p>
+            <p class="text-gray-400 text-sm mt-1">Пн-Вс: 9:00 - 00:00</p>
+          </div>
+          <div class="brutal-border brutal-shadow bg-white p-8 text-center card-hover">
+            <div class="w-16 h-16 bg-brutal-red text-white flex items-center justify-center mx-auto mb-4 brutal-border">
+              <i data-lucide="phone" class="w-8 h-8"></i>
+            </div>
+            <h3 class="font-heading text-2xl mb-2">ТЕЛЕФОН</h3>
+            <p id="contact-phone" class="text-gray-600 text-lg font-semibold">+996 224000404</p>
+            <p class="text-gray-400 text-sm mt-1">Звоните в любое время</p>
+          </div>
+          <div class="brutal-border brutal-shadow bg-white p-8 text-center card-hover">
+            <div class="w-16 h-16 bg-brutal-red text-white flex items-center justify-center mx-auto mb-4 brutal-border">
+              <i data-lucide="share-2" class="w-8 h-8"></i>
+            </div>
+            <h3 class="font-heading text-2xl mb-2">СОЦСЕТИ</h3>
+            <div class="flex justify-center gap-4 mt-4">
+              <a href="#"
+                class="w-12 h-12 bg-brutal-black text-white flex items-center justify-center brutal-border btn-brutal"><i
+                  data-lucide="instagram" class="w-5 h-5"></i></a> <a href="#"
+                class="w-12 h-12 bg-brutal-black text-white flex items-center justify-center brutal-border btn-brutal"><i
+                  data-lucide="send" class="w-5 h-5"></i></a> <a href="#"
+                class="w-12 h-12 bg-green-500 text-white flex items-center justify-center brutal-border btn-brutal"><i
+                  data-lucide="message-circle" class="w-5 h-5"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section><!-- FOOTER -->
+    <footer class="bg-brutal-black text-white py-8 border-t-3 border-brutal-red">
+      <div class="max-w-7xl mx-auto px-4 text-center">
+        <p class="font-heading text-2xl mb-2" id="footer-logo"><span class="text-brutal-red">FLO</span>RISTA</p>
+        <p class="text-gray-500 text-sm">© 2026 Все права защищены. Сделано с </p>
+      </div>
+    </footer>
+  </div>
+  <script>
+    // Products data
+    const products = [
+      { cat: 'bouquets', name: 'Крассные розы', price: 3500, emoji: '', image: 'thh.jpg' },
+      { cat: 'bouquets', name: 'Хоризентема', price: 2800, emoji: '', image: 'ad.jpg' },
+      { cat: 'bouquets', name: 'Белые розы', price: 3200, emoji: '', image: '11.jpg' },
+      { cat: 'bouquets', name: 'Кустовые розы', price: 2500, emoji: '', image: 'пр.jpg' },
+      { cat: 'bouquets', name: 'Гортензия', price: 3500, emoji: '', image: '08.jpg' },
+      { cat: 'bouquets', name: 'Авторский букет ', price: 2800, emoji: '', image: '09.jpg' },
+      { cat: 'bouquets', name: 'Букет из кустовых роз', price: 3200, emoji: '', image: '05.jpg' },
+      { cat: 'bouquets', name: 'Авторский букет', price: 2500, emoji: '', image: '03.jpg' },
+      { cat: 'box', name: 'Коробка роз', price: 4500, emoji: '', image: 'miks.jpg' },
+      { cat: 'box', name: 'Компазиция в корзине', price: 5200, emoji: '', image: '3SV.jpg' },
+      { cat: 'box', name: 'Коробка роз', price: 4500, emoji: '', image: 'sa.l.jpg' },
+      { cat: 'box', name: 'Белые розы в каробке', price: 5200, emoji: '', image: 'op.jpg' },
+      { cat: 'box', name: 'Голубая гортензия в каборке', price: 4500, emoji: '', image: '888.jpg' },
+      { cat: 'box', name: 'Белая гортензия в каробке', price: 5200, emoji: '', image: 'гг.jpg' },
+      { cat: 'basket', name: 'Кашпо "Софии"', price: 3800, emoji: '', image: '06.jpg' },
+      { cat: 'basket', name: 'Кашпо в ранункулюсов', price: 4200, emoji: '', image: '07.jpg' },
+      { cat: 'toys', name: 'Милые барашки', price: 1500, emoji: '', image: '04.jpg' },
+      { cat: 'toys', name: 'Две мишки', price: 1800, emoji: '', image: 'oo.jpg' },
+      { cat: 'choco', name: 'Клубника шоколаде', price: 2800, emoji: '', image: 'klu.jpg' },
+      { cat: 'choco', name: 'Клубника Микс', price: 2200, emoji: '', image: 'https://choco-flowers.kz/image/cache/catalog/%20%D0%BA%D0%B0%D1%82%D0%B0%D0%BB%D0%BE%D0%B3%20/IMG_2614-1000x667w.JPG' },
+      { cat: 'choco', name: 'Финики в шоколаде', price: 2800, emoji: '', image: 'фф.jpg' },
+      { cat: 'choco', name: 'Банан в шоколаде', price: 2200, emoji: '', image: 'рор.jpg' },
+    ];
+
+    let cart = [];
+    let currentCat = 'all';
+
+    function renderProducts() {
+      const grid = document.getElementById('product-grid');
+      const filtered = currentCat === 'all' ? products : products.filter(p => p.cat === currentCat);
+      grid.innerHTML = '';
+      filtered.forEach((p, i) => {
+        const card = document.createElement('div');
+        card.className = `brutal-border bg-white text-black card-hover anim-up delay-${(i % 4) + 1}`;
+        card.innerHTML = `
+      <div class="p-0">
+        <img src="${p.image}" alt="${p.name}" loading="lazy" class="product-img" onerror="this.style.background='linear-gradient(135deg, #fef2f2, #fee2e2)'; this.style.display='none'">
+      </div>
+      <div class="p-4">
+        <h3 class="font-heading text-xl">${p.name}</h3>
+        <p class="font-heading text-2xl text-brutal-red mt-1">${p.price.toLocaleString()} с</p>
+        <button onclick="addToCart(${products.indexOf(p)})" class="mt-3 w-full bg-brutal-red text-white font-heading text-lg py-3 brutal-border btn-brutal flex items-center justify-center gap-2">
+          <i data-lucide="shopping-bag" class="w-4 h-4"></i> В КОРЗИНУ
+        </button>
+      </div>`;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function filterCat(cat) {
+      currentCat = cat;
+      document.querySelectorAll('.cat-btn').forEach(b => {
+        const active = b.dataset.cat === cat;
+        b.className = `cat-btn font-heading text-lg px-6 py-2 brutal-border btn-brutal ${active ? 'bg-brutal-red text-white' : 'bg-white text-black'}`;
+      });
+      renderProducts();
+    }
+
+    function addToCart(idx) {
+      const p = products[idx];
+      const existing = cart.find(c => c.idx === idx);
+      if (existing) existing.qty++;
+      else cart.push({ idx, qty: 1 });
+      updateCartUI();
+      showToast(`${p.emoji} ${p.name} добавлен в корзину!`);
+    }
+
+    function removeFromCart(idx) {
+      cart = cart.filter(c => c.idx !== idx);
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const countEl = document.getElementById('cart-count');
+      const total = cart.reduce((s, c) => s + c.qty, 0);
+      countEl.textContent = total;
+      countEl.classList.toggle('hidden', total === 0);
+      const itemsEl = document.getElementById('cart-items');
+      const emptyEl = document.getElementById('cart-empty');
+      const footerEl = document.getElementById('cart-footer');
+      if (cart.length === 0) {
+        itemsEl.innerHTML = '';
+        emptyEl.classList.remove('hidden');
+        footerEl.classList.add('hidden');
+        return;
+      }
+      emptyEl.classList.add('hidden');
+      footerEl.classList.remove('hidden');
+      itemsEl.innerHTML = '';
+      let sum = 0;
+      cart.forEach(c => {
+        const p = products[c.idx];
+        sum += p.price * c.qty;
+        const div = document.createElement('div');
+        div.className = 'flex items-center gap-3 brutal-border p-3';
+        div.innerHTML = `
+      <span class="text-2xl">${p.emoji}</span>
+      <div class="flex-1"><p class="font-bold text-sm">${p.name}</p><p class="text-gray-500 text-xs">${p.price.toLocaleString()} с × ${c.qty}</p></div>
+      <div class="flex items-center gap-1">
+        <button onclick="changeQty(${c.idx},-1)" class="w-7 h-7 brutal-border text-xs font-bold bg-white btn-brutal flex items-center justify-center">−</button>
+        <span class="w-6 text-center font-bold text-sm">${c.qty}</span>
+        <button onclick="changeQty(${c.idx},1)" class="w-7 h-7 brutal-border text-xs font-bold bg-white btn-brutal flex items-center justify-center">+</button>
+      </div>
+      <button onclick="removeFromCart(${c.idx})" class="text-red-500 ml-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+        itemsEl.appendChild(div);
+      });
+      document.getElementById('cart-total').textContent = sum.toLocaleString() + ' с';
+      // Build WA message
+      const waNum = (window.elementSdk && window.elementSdk.config.whatsapp_number) || '+996';
+      const clean = waNum.replace(/[^\d+]/g, '');
+      let msg = 'Здравствуйте! Хочу заказать:\n';
+      cart.forEach(c => { const p = products[c.idx]; msg += `• ${p.name} × ${c.qty} = ${(p.price * c.qty).toLocaleString()}с\n`; });
+      msg += `\nИтого: ${sum.toLocaleString()}с`;
+      document.getElementById('cart-wa-btn').href = `https://wa.me/${clean.replace('+', '')}?text=${encodeURIComponent(msg)}`;
+      lucide.createIcons();
+    }
+
+    function changeQty(idx, d) {
+      const item = cart.find(c => c.idx === idx);
+      if (!item) return;
+      item.qty += d;
+      if (item.qty <= 0) cart = cart.filter(c => c.idx !== idx);
+      updateCartUI();
+    }
+
+    function openCart() { document.getElementById('cart-modal').classList.remove('hidden'); updateCartUI(); }
+    function closeCart() { document.getElementById('cart-modal').classList.add('hidden'); }
+    function toggleMobile() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
+    function closeMobile() { document.getElementById('mobile-menu').classList.add('hidden'); }
+
+    function showToast(msg) {
+      const c = document.getElementById('toast-container');
+      const t = document.createElement('div');
+      t.className = 'toast bg-white text-black';
+      t.textContent = msg;
+      c.appendChild(t);
+      setTimeout(() => t.remove(), 2500);
+    }
+
+    // Element SDK
+    const defaultConfig = {
+      shop_name: 'FLORISTA',
+      hero_title: 'ЦВЕТЫ С ХАРАКТЕРОМ',
+      hero_subtitle: 'Доставка по городу за 60 минут. Букеты, которые говорят громче слов.',
+      whatsapp_number: '+996 224000404',
+      address_text: 'г. Манас, 1 Адрес:Курманбек 4Г',
+      address_text: 'г. Манас, 2 Адрес: Пр.Т.Байзакова 33',
+      phone_text: '+996 224000404',
+      background_color: '#fafafa',
+      accent_color: '#dc2626',
+      dark_color: '#0a0a0a',
+      text_color: '#374151',
+      surface_color: '#ffffff',
+      font_family: 'Bebas Neue',
+      font_size: 16
+    };
+
+    function applyConfig(cfg) {
+      const c = { ...defaultConfig, ...cfg };
+      // Text
+      const logo = c.shop_name || defaultConfig.shop_name;
+      const parts = logo.split(' ');
+      const logoHtml = parts.length > 1 ? `<span class="text-brutal-red">${parts[0]}</span> ${parts.slice(1).join(' ')}` : `<span class="text-brutal-red">${logo}</span>`;
+      document.getElementById('nav-logo').innerHTML = logoHtml;
+      document.getElementById('footer-logo').innerHTML = logoHtml;
+
+      const ht = c.hero_title || defaultConfig.hero_title;
+      const htWords = ht.split(' ');
+      const mid = Math.ceil(htWords.length / 2);
+      document.getElementById('hero-title').innerHTML = htWords.slice(0, mid).join(' ') + '<br><span class="text-brutal-red">' + htWords.slice(mid).join(' ') + '</span>';
+      document.getElementById('hero-subtitle').textContent = c.hero_subtitle || defaultConfig.hero_subtitle;
+      document.getElementById('contact-address').textContent = c.address_text || defaultConfig.address_text;
+      document.getElementById('contact-phone').textContent = c.phone_text || defaultConfig.phone_text;
+
+      // WA banner
+      const waClean = (c.whatsapp_number || defaultConfig.whatsapp_number).replace(/[^\d+]/g, '').replace('+', '');
+      document.getElementById('wa-banner-btn').href = `https://wa.me/${waClean}?text=${encodeURIComponent('Здравствуйте! Хочу заказать букет 🌹')}`;
+
+      // Colors
+      document.documentElement.style.setProperty('--accent', c.accent_color);
+
+      // Font
+      const font = c.font_family || defaultConfig.font_family;
+      document.querySelectorAll('.font-heading').forEach(el => el.style.fontFamily = `${font}, sans-serif`);
+
+      const base = c.font_size || defaultConfig.font_size;
+      document.querySelectorAll('.font-heading').forEach(el => {
+        const current = parseFloat(getComputedStyle(el).fontSize);
+        if (current > 40) el.style.fontSize = `${base * 3}px`;
+        else if (current > 24) el.style.fontSize = `${base * 1.5}px`;
+      });
+    }
+
+    window.elementSdk.init({
+      defaultConfig,
+      onConfigChange: async (cfg) => applyConfig(cfg),
+      mapToCapabilities: (cfg) => ({
+        recolorables: [
+          { get: () => cfg.background_color || defaultConfig.background_color, set: v => { cfg.background_color = v; window.elementSdk.setConfig({ background_color: v }) } },
+          { get: () => cfg.surface_color || defaultConfig.surface_color, set: v => { cfg.surface_color = v; window.elementSdk.setConfig({ surface_color: v }) } },
+          { get: () => cfg.text_color || defaultConfig.text_color, set: v => { cfg.text_color = v; window.elementSdk.setConfig({ text_color: v }) } },
+          { get: () => cfg.accent_color || defaultConfig.accent_color, set: v => { cfg.accent_color = v; window.elementSdk.setConfig({ accent_color: v }) } },
+          { get: () => cfg.dark_color || defaultConfig.dark_color, set: v => { cfg.dark_color = v; window.elementSdk.setConfig({ dark_color: v }) } }
+        ],
+        borderables: [],
+        fontEditable: { get: () => cfg.font_family || defaultConfig.font_family, set: v => { cfg.font_family = v; window.elementSdk.setConfig({ font_family: v }) } },
+        fontSizeable: { get: () => cfg.font_size || defaultConfig.font_size, set: v => { cfg.font_size = v; window.elementSdk.setConfig({ font_size: v }) } }
+      }),
+      mapToEditPanelValues: (cfg) => new Map([
+        ['shop_name', cfg.shop_name || defaultConfig.shop_name],
+        ['hero_title', cfg.hero_title || defaultConfig.hero_title],
+        ['hero_subtitle', cfg.hero_subtitle || defaultConfig.hero_subtitle],
+        ['whatsapp_number', cfg.whatsapp_number || defaultConfig.whatsapp_number],
+        ['address_text', cfg.address_text || defaultConfig.address_text],
+        ['phone_text', cfg.phone_text || defaultConfig.phone_text]
+      ])
+    });
+
+    // Init
+    renderProducts();
+    lucide.createIcons();
+  </script>
+  <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'9eb8b6587182512f',t:'MTc3NjA2NDg2OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+</body>
+
+</html>
